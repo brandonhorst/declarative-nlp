@@ -1,8 +1,8 @@
-# Natural Language Processing with Components
+# Natural Language Processing with Declarative Components
 
-This forms the basis of Lacona, a [language processing framework](lacona/lacona) that runs behind a [Mac App of the same name](https://www.kickstarter.com/projects/2102999333/lacona-natural-language-commands-for-your-mac).
+This describes the logic behind lacona, an open-source [language processing framework](lacona/lacona). lacona has been used to build a [Mac App of the same name](https://www.kickstarter.com/projects/2102999333/lacona-natural-language-commands-for-your-mac) which is currently on Kickstarter. If you just want to see the app in action, please [watch the video](https://www.kickstarter.com/projects/2102999333/lacona-natural-language-commands-for-your-mac) or [demo it yourself online](http://lacona.io).
 
-React is a Javascript framework for declaratively building webpages. The beauty is that the complexities of state management are abstracted away, because components are defined declaratively. Components are composed of other components, which pass props down through to the chain.
+React is a Javascript framework for declaratively building webpages. The beauty is that implementation complexities are abstracted away, because components can be nested. Components are composed of other components, which pass `props` down through to the chain. React also defines its components declaratively based on `state` objects, which Lacona implements through `sources`.
 
 ## Defining Stuff: Grammar
 
@@ -74,7 +74,7 @@ Lacona supports two different kinds of addons - **commands**, which give Lacona 
 
 ### Commands
 
-I'll explain by way of example. The developer could make a new command that allows users to tweet. You define two things: the **grammar** (described above) and the **logic** (the code that physically sends the tweet to Twitter). These are defined in an ES6 class definition (though the can easily be described using ES5 syntax). Note that we have abstracted the <
+I'll explain by way of example. The developer could make a new command that allows users to tweet. You define two things: the **grammar** (described above) and the **logic** (the code that physically sends the tweet to Twitter). These are defined in an ES6 class definition (though the can easily be described using ES5 syntax). Note that we have abstracted the `<StringPhrase>` into its own component, `<TweetContent>`.
 
 ```js
 /** @jsx createElement */
@@ -177,9 +177,15 @@ Many of the built-in commands use the `<StringPhrase>` component, so the user wi
 
 ![Command Structure](https://raw.github.com/lacona/kickstarter-nerd-details/master/images/SearchSentence@2x.png)
 
-## Internationalization
+## Why Do It This Way?
 
-Of course, the problem with Natural Language interfaces is that they're fairly difficult to translate. It's not enough to simply translate the labels in a form and call it a day. Here are just a few common design issues.
+Traditional NLP libraries break sentences into their grammatical components. Lacona instead chooses to purely operate on strings, without concern for grammar. Any understanding of grammar must be programmed into the components directly.
+
+This is done to simplify the work of the developer and any pontential translators.
+
+### Internationalization
+
+The problem with Natural Language interfaces is that they're fairly difficult to translate. It's not enough to simply translate the labels in a form and call it a day. Here are just a few common design issues.
 
 - Languages have different word order, including the position of verbs
 - Some languages have accented/modified characters, which can be essential but are a pain to type
@@ -191,15 +197,12 @@ Of course, the problem with Natural Language interfaces is that they're fairly d
 - In some languages, the user enters text in one character set, and replaced with different characters over time
 - Some languages have words that simply do not have an equivalent in other languages
 - Some languages use distinguish between different verbs depending upon the verb's object, while other languages do not
-- Clearly, there are a lot of issues. Because of this, Lacona's language processing is as general as possible. It does not rely on the verb coming at the beginning of a sentence, it does not rely on words being separated by spaces, and it does not rely on any particular character set. It takes any input, interprets it according to its Commands, forms an data structure based upon the input, and sends the data to the command to execute.
+
+Clearly, there are a lot of issues. Because of this, Lacona's language processing is as general as possible. It does not rely on the verb coming at the beginning of a sentence, it does not rely on words being separated by spaces, and it does not rely on any particular character set. It takes any input, interprets it according to its Commands, forms an data structure based upon the input, and sends the data to the command to execute.
 
 This means that the *language* of Commands can be translated, while keeping the *code* the same. Developers do not need to know any other languages, or anything about language processing at all. And translators don't need to know anything about code. Lacona handles all of that.
 
-## Under the Hood
-
-Lacona does not know English. That is to say, it cannot break a sentence into grammatical components, and it cannot infer any meaning from an arbitrary sentence. It understands only the sentences that have been described for it in Commands, and nothing more.
-
-This means that everything that Lacona can do must be translated manually into every new language that it is to support. Lacona will only launch with support for US and UK English. However, all of the Lacona commands will be open-source, so that multilingual users from around the world can add new translations.
+### Formal Grammar Stuff
 
 To get a bit more technical, you can think of Lacona Commands as closer Formal Grammars, or very glorified Regular Expressions. It takes arbitrary strings as input, and interprets them according to its rules. I am not an expert in computational linguistics, but I can provide a bit more information. the biggest differences are:
 
